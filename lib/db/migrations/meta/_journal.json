@@ -8,6 +8,13 @@
       "when": 1753457097099,
       "tag": "0000_giant_the_twelve",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1753539627809,
+      "tag": "0001_yellow_slapstick",
+      "breakpoints": true
     }
   ]
 }
