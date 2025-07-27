@@ -8,10 +8,7 @@
         <p class="py-6">
           Discover and share your travel experiences with the world. Join our community of travelers and start logging your adventures today!
         </p>
-        <button class="btn btn-accent">
-          Sign In With Github
-          <icon name="tabler:brand-github" size="24" />
-        </button>
+        <auth-button />
       </div>
     </div>
   </div>
