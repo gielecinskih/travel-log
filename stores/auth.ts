@@ -3,10 +3,15 @@ import { createAuthClient } from "better-auth/vue";
 const authClient = createAuthClient();
 
 export const useAuthStore = defineStore("auth", () => {
-  const session = authClient.useSession();
-  const user = computed(() => session.value.data?.user);
+  const session = ref<Awaited<ReturnType<typeof authClient.useSession>> | null>(null);
+  const init = async () => {
+    const data = await authClient.useSession(useFetch);
+    session.value = data;
+  };
 
-  const loading = computed(() => session.value.isPending || session.value.isRefetching);
+  const user = computed(() => session.value?.data?.user);
+
+  const loading = computed(() => session.value?.isPending);
   const signIn = async () => {
     if (loading.value)
       return;
@@ -32,6 +37,8 @@ export const useAuthStore = defineStore("auth", () => {
   };
 
   return {
+    init,
+
     loading,
     signIn,
     signOut,
