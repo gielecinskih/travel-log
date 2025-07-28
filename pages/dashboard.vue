@@ -19,14 +19,29 @@ onMounted(() => {
         <Icon v-else name="tabler:chevron-right" size="32" />
       </div>
       <div class="flex flex-col ">
-        <sidebar-button icon="tabler:map" label="Locations" href="/dashboard" :show-label="isSideBarOpen" />
-        <sidebar-button icon="tabler:circle-plus-filled" label="Add location" href="/dashboard/add" :show-label="isSideBarOpen" />
+        <sidebar-button
+          icon="tabler:map"
+          label="Locations"
+          href="/dashboard"
+          :show-label="isSideBarOpen"
+        />
+        <sidebar-button
+          icon="tabler:circle-plus-filled"
+          label="Add location"
+          href="/dashboard/add"
+          :show-label="isSideBarOpen"
+        />
         <div class="divider" />
-        <sidebar-button icon="tabler:logout-2" label="Sign Out" href="/sign-out" :show-label="isSideBarOpen" />
+        <sidebar-button
+          icon="tabler:logout-2"
+          label="Sign Out"
+          href="/sign-out"
+          :show-label="isSideBarOpen"
+        />
       </div>
     </div>
     <div class="flex-1 ">
-      cos
+      <nuxt-page />
     </div>
   </div>
 </template>
