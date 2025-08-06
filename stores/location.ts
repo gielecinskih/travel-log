@@ -1,7 +1,6 @@
 export const useLocationStore = defineStore("location", () => {
   const { data, status, refresh } = useFetch("/api/locations", {
     lazy: true,
-    immediate: false,
   });
 
   const sidebarStore = useSidebarStore();
