@@ -1,0 +1,1 @@
+export const CENTER_POLAND = [19.1343786, 51.9189046];
