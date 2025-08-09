@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const locationStore = useLocationStore();
+const mapStore = useMapStore();
 
 const { locations, status } = storeToRefs(locationStore);
 
@@ -16,8 +17,15 @@ onMounted(() => {
     <div v-if="status === 'pending'" class="mt-4">
       <span class="loading loading-spinner loading-xl" />
     </div>
-    <div v-else-if="locations && locations.length" class="flex flex-nowrap mt-4 gap-2 overflow-auto">
-      <div v-for="location in locations" :key="location.id" class="card card-compact bg-base-300 h-40 w-72 shrink-0">
+    <div v-else-if="locations && locations.length" class="flex flex-nowrap my-4 gap-2 overflow-auto">
+      <div
+        v-for="location in locations"
+        :key="location.id"
+        class="card card-compact bg-base-300 border-2 border-transparent h-40 w-72 mb-2 shrink-0 hover:cursor-pointer"
+        :class="{ '!border-accent': mapStore.selectedPoint?.id === location.id }"
+        @mouseenter="mapStore.selectedPoint = location"
+        @mouseleave="mapStore.selectedPoint = null"
+      >
         <div class="card-body">
           <h3 class="text-xl">
             {{ location.name }}
