@@ -1,3 +1,4 @@
-import type { LngLatLike } from "maplibre-gl";
-
-export const CENTER_POLAND: LngLatLike = [19.1343786, 51.9189046];
+export const CENTER_POLAND: { lng: number; lat: number } = {
+  lng: 19.1343786,
+  lat: 51.9189046,
+};
