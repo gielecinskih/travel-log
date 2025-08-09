@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const sidebarStore = useSidebarStore();
 const locationStore = useLocationStore();
+const mapStore = useMapStore();
 const route = useRoute();
 const isSideBarOpen = ref(true);
 
@@ -20,9 +21,21 @@ onMounted(() => {
 <template>
   <div class="flex-1 flex">
     <div class="bg-base-100 w-16 transition-all duration-300 shrink-0" :class="{ 'w-64': isSideBarOpen }">
-      <div class="flex justify-end cursor-pointer hover:bg-base-200 p-2" :class="{ '!justify-center': !isSideBarOpen }" @click="toggleSidebar">
-        <Icon v-if="isSideBarOpen" name="tabler:chevron-left" size="32" />
-        <Icon v-else name="tabler:chevron-right" size="32" />
+      <div
+        class="flex justify-end cursor-pointer hover:bg-base-200 p-2"
+        :class="{ '!justify-center': !isSideBarOpen }"
+        @click="toggleSidebar"
+      >
+        <Icon
+          v-if="isSideBarOpen"
+          name="tabler:chevron-left"
+          size="32"
+        />
+        <Icon
+          v-else
+          name="tabler:chevron-right"
+          size="32"
+        />
       </div>
       <div class="flex flex-col ">
         <sidebar-button
@@ -45,10 +58,13 @@ onMounted(() => {
           <sidebar-button
             v-for="item in sidebarStore.sidebarItems"
             :key="item.id"
-            :label="item.label"
+            :label="item.name"
             :icon="item.icon"
             :href="item.href"
             :show-label="isSideBarOpen"
+            :icon-color="mapStore.selectedPoint?.id === item.location?.id ? 'text-accent' : ''"
+            @mouseenter="mapStore.selectedPoint = item.location ?? null"
+            @mouseleave="mapStore.selectedPoint = null"
           />
         </div>
         <div v-if="sidebarStore.loading || sidebarStore.sidebarItems.length" class="divider" />
