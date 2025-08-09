@@ -76,8 +76,8 @@ onMounted(() => {
         />
       </div>
     </div>
-    <div class="flex-1 overflow-auto">
-      <div class="flex size-full flex-col">
+    <div class="flex-1 overflow-auto bg-base-200">
+      <div class="flex size-full " :class="{ 'flex-col': route.path !== '/dashboard/add' }">
         <nuxt-page />
         <app-map />
       </div>
