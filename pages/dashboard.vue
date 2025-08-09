@@ -19,7 +19,7 @@ onMounted(() => {
 
 <template>
   <div class="flex-1 flex">
-    <div class="bg-base-100 w-16 transition-all duration-300" :class="{ 'w-64': isSideBarOpen }">
+    <div class="bg-base-100 w-16 transition-all duration-300 shrink-0" :class="{ 'w-64': isSideBarOpen }">
       <div class="flex justify-end cursor-pointer hover:bg-base-200 p-2" :class="{ '!justify-center': !isSideBarOpen }" @click="toggleSidebar">
         <Icon v-if="isSideBarOpen" name="tabler:chevron-left" size="32" />
         <Icon v-else name="tabler:chevron-right" size="32" />
@@ -41,7 +41,7 @@ onMounted(() => {
         <div v-if="sidebarStore.loading" class="px-4">
           <div class="skeleton h-4 w-full" />
         </div>
-        <template v-else-if="sidebarStore.sidebarItems.length">
+        <div v-else-if="sidebarStore.sidebarItems.length" class="flex flex-col">
           <sidebar-button
             v-for="item in sidebarStore.sidebarItems"
             :key="item.id"
@@ -50,7 +50,7 @@ onMounted(() => {
             :href="item.href"
             :show-label="isSideBarOpen"
           />
-        </template>
+        </div>
         <div v-if="sidebarStore.loading || sidebarStore.sidebarItems.length" class="divider" />
         <sidebar-button
           icon="tabler:logout-2"
@@ -60,9 +60,11 @@ onMounted(() => {
         />
       </div>
     </div>
-    <div class="flex-1 flex flex-col">
-      <nuxt-page />
-      <app-map class="flex-1" />
+    <div class="flex-1 overflow-auto">
+      <div class="flex size-full flex-col">
+        <nuxt-page />
+        <app-map />
+      </div>
     </div>
   </div>
 </template>
