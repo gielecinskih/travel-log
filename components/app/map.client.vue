@@ -47,6 +47,7 @@ const zoom = 4;
         lat: mapStore.addedPoint.lat,
       }"
       draggable
+      class-name="z-50"
       @update:coordinates="updateAddedPoint"
     >
       <template #marker>

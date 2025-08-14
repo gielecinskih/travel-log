@@ -3,6 +3,8 @@ import type { FetchError } from "ofetch";
 
 import { toTypedSchema } from "@vee-validate/zod";
 
+import type { NominatimResult } from "~/lib/types";
+
 import { CENTER_POLAND } from "~/lib/constants";
 import { insertLocationSchema } from "~/lib/db/schema";
 
@@ -52,12 +54,24 @@ const onSubmit = handleSubmit(async (values) => {
     const error = e as FetchError;
     if (error.data.data)
       setErrors(error.data.data || {});
-    submitError.value = error.data.statusMessage || error.statusMessage || "An error occurred while adding the location.";
+    submitError.value = getFetchErrorMessage(error);
   }
   finally {
     loading.value = false;
   }
 });
+
+function searchResultSelected(result: NominatimResult) {
+  mapStore.addedPoint = {
+    id: 1,
+    name: "",
+    description: "",
+    lat: Number(result.lat),
+    lng: Number(result.lon),
+  };
+
+  setFieldValue("name", result.display_name);
+}
 
 effect(() => {
   if (mapStore.addedPoint) {
@@ -123,16 +137,23 @@ function formatValue(value?: number) {
         :disabled="loading"
         :error="errors.description"
       />
-      <p>
-        Drag the marker <Icon
-          name="tabler:map-pin-filled"
-          class="text-warning"
-          size="14"
-        /> to your desired location. Or double click on the map.
-      </p>
       <p class="text-xs text-gray-400">
         Current location: {{ formatValue(controlledValues.lat) }} {{ formatValue(controlledValues.lng) }}
       </p>
+      <p>
+        To set the location:
+      </p>
+      <ul class="list-disc ml-4 text-sm">
+        <li>
+          Drag the marker <Icon
+            name="tabler:map-pin-filled"
+            class="text-warning"
+            size="14"
+          />
+        </li>
+        <li>Double click on the map</li>
+        <li>Search for location below</li>
+      </ul>
 
       <div class="flex justify-end gap-2">
         <button
@@ -159,5 +180,7 @@ function formatValue(value?: number) {
         </button>
       </div>
     </form>
+    <div class="divider" />
+    <app-place-search @result-selected="searchResultSelected" />
   </div>
 </template>
