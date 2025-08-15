@@ -15,5 +15,7 @@ export const useSidebarStore = defineStore("sidebar", () => {
   const sidebarItems = ref<SidebarItem[]>([]);
   const loading = ref(false);
 
-  return { sidebarItems, loading };
+  const sidebarTopItems = ref<SidebarItem[]>([]);
+
+  return { sidebarItems, loading, sidebarTopItems };
 });

@@ -5,6 +5,8 @@ const mapStore = useMapStore();
 const route = useRoute();
 const isSideBarOpen = ref(true);
 
+const { currentLocation } = storeToRefs(locationStore);
+
 function toggleSidebar() {
   isSideBarOpen.value = !isSideBarOpen.value;
   localStorage.setItem("sidebarOpen", isSideBarOpen.value.toString());
@@ -13,7 +15,69 @@ function toggleSidebar() {
 onMounted(() => {
   isSideBarOpen.value = localStorage.getItem("sidebarOpen") !== "false";
   if (route.path !== "/dashboard") {
-    locationStore.refresh();
+    locationStore.refreshLocations();
+  }
+});
+
+effect(() => {
+  if (route.name === "dashboard") {
+    sidebarStore.sidebarTopItems = [
+      {
+        id: "link-dashboard",
+        name: "Locations",
+        icon: "tabler:map",
+        href: "/dashboard",
+      },
+      {
+        id: "link-dashboard-add",
+        name: "Add",
+        icon: "tabler:circle-plus-filled",
+        to: "/dashboard/add",
+      },
+    ];
+  }
+  if (route.name === "dashboard-location-slug") {
+    sidebarStore.sidebarTopItems = [
+      {
+        id: "link-dashboard",
+        name: "Back to locations",
+        icon: "tabler:arrow-left",
+        href: "/dashboard",
+      },
+      {
+        id: "link-dashboard-add-log",
+        name: currentLocation.value ? currentLocation.value.name : "View logs",
+        icon: "tabler:map",
+        to: {
+          name: "dashboard-location-slug",
+          params: {
+            slug: currentLocation.value?.slug,
+          },
+        },
+      },
+      {
+        id: "link-dashboard-slug-edit",
+        name: "Edit location",
+        icon: "tabler:map-pin-cog",
+        to: {
+          name: "dashboard-location-slug-edit",
+          params: {
+            slug: currentLocation.value?.slug,
+          },
+        },
+      },
+      {
+        id: "link-dashboard-slug-add",
+        name: "Add location log",
+        icon: "tabler:circle-plus-filled",
+        to: {
+          name: "dashboard-location-slug-add",
+          params: {
+            slug: currentLocation.value?.slug,
+          },
+        },
+      },
+    ];
   }
 });
 </script>
@@ -39,15 +103,12 @@ onMounted(() => {
       </div>
       <div class="flex flex-col ">
         <sidebar-button
-          icon="tabler:map"
-          label="Locations"
-          href="/dashboard"
-          :show-label="isSideBarOpen"
-        />
-        <sidebar-button
-          icon="tabler:circle-plus-filled"
-          label="Add location"
-          href="/dashboard/add"
+          v-for="item in sidebarStore.sidebarTopItems"
+          :key="item.id"
+          :icon="item.icon"
+          :label="item.name"
+          :href="item.href"
+          :to="item.to"
           :show-label="isSideBarOpen"
         />
         <div class="divider" />

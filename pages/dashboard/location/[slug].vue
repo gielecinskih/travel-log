@@ -1,43 +1,37 @@
 <script setup lang="ts">
-const route = useRoute();
-const mapStore = useMapStore();
+const locationsStore = useLocationStore();
+const { currentLocation, currentLocationStatus, currentLocationError } = storeToRefs(locationsStore);
 
-const { slug } = route.params;
-
-const { data: location, status, error } = await useFetch(`/api/location/${slug}`, { lazy: true });
-
-effect(() => {
-  if (location.value) {
-    mapStore.mapPoints = [location.value];
-  }
+onMounted(() => {
+  locationsStore.refreshCurrentLocation();
 });
 </script>
 
 <template>
   <div class="p-4 min-h-64">
-    <div v-if="status === 'pending'">
+    <div v-if="currentLocationStatus === 'pending'">
       <div class="loading" />
     </div>
-    <div v-if="location && status !== 'pending' ">
+    <div v-if="currentLocation && currentLocationStatus !== 'pending' ">
       <h2 class="text-xl">
-        {{ location.name }}
+        {{ currentLocation.name }}
       </h2>
       <p class="text-sm">
-        {{ location.description }}
+        {{ currentLocation.description }}
       </p>
-      <div v-if="!location.locationLogs.length" class="mt-4">
+      <div v-if="!currentLocation.locationLogs.length" class="mt-4">
         <p class="text-sm ">
           Add a location log to get started.
         </p>
-        <button class="btn btn-primary mt-2">
+        <nuxt-link :to="{ name: 'dashboard-location-slug-add', params: { slug: currentLocation.slug } }" class="btn btn-primary mt-2">
           Add Location log
           <Icon name="tabler:map-pin-plus" size="24" />
-        </button>
+        </nuxt-link>
       </div>
     </div>
-    <div v-if="error && status !== 'pending'" class="alert alert-error">
+    <div v-if="currentLocationError && currentLocationStatus !== 'pending'" class="alert alert-error">
       <h2 class="text-lg">
-        {{ error.statusMessage }}
+        {{ currentLocationError.statusMessage }}
       </h2>
     </div>
   </div>
