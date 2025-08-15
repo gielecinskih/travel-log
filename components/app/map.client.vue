@@ -72,14 +72,14 @@ const zoom = 4;
       <template #marker>
         <div
           class="tooltip tooltip-top hover:cursor-pointer"
-          :class="{ ' tooltip-open': mapStore.selectedPoint?.id === point.id }"
+          :class="{ ' tooltip-open': isPointSelected(point, mapStore.selectedPoint) }"
           :data-tip="point.name"
           @mouseenter="mapStore.selectedPoint = point"
           @mouseleave="mapStore.selectedPoint = null"
         >
           <Icon
             name="tabler:map-pin-filled"
-            :class="mapStore.selectedPoint?.id === point.id ? 'text-accent' : 'text-secondary'"
+            :class="isPointSelected(point, mapStore.selectedPoint) ? 'text-accent' : 'text-secondary'"
             :size="30"
           />
         </div>
@@ -91,6 +91,15 @@ const zoom = 4;
         <p v-if="point.description">
           {{ point.description }}
         </p>
+        <div class="flex justify-end mt-2">
+          <nuxt-link
+            v-if="point.to"
+            :to="point.to"
+            class="btn btn-sm btn-outline"
+          >
+            {{ point.toLabel }}
+          </nuxt-link>
+        </div>
       </MglPopup>
     </MglMarker>
   </MglMap>

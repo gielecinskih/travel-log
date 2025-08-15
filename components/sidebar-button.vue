@@ -1,8 +1,11 @@
 <script setup lang="ts">
+import type { RouteLocationRaw } from "vue-router";
+
 const { href } = defineProps<{
   icon: string;
   label: string;
-  href: string;
+  href?: string;
+  to?: RouteLocationRaw;
   iconColor?: string;
   showLabel: boolean;
 }>();
@@ -14,7 +17,7 @@ const isActive = computed(() => route.path === href);
 <template>
   <div class="tooltip  tooltip-right" :data-tip="showLabel ? undefined : label">
     <nuxt-link
-      :to="href"
+      :to="href || to"
       :class="{ 'bg-base-200': isActive, '!justify-center': !showLabel }"
       class="flex p-2 gap-2 hover:bg-base-300 hover:cursor-pointer justify-start items-center"
     >

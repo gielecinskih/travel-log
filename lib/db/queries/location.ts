@@ -53,3 +53,16 @@ export async function findLocations(userId: number) {
     orderBy: (location, { asc }) => asc(location.createdAt),
   });
 }
+
+export async function findLocation(userId: number, slug: string) {
+  return await db.query.location.findFirst({
+    where: and(
+      eq(location.slug, slug),
+      eq(location.userId, userId),
+    ),
+    with: {
+      locationLogs: true,
+    },
+    orderBy: (location, { asc }) => asc(location.createdAt),
+  });
+}
