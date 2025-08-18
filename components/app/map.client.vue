@@ -1,53 +1,53 @@
 <script lang="ts" setup>
-import type { LngLat, MapMouseEvent } from "maplibre-gl";
+import type { MglEvent } from "@indoorequal/vue-maplibre-gl";
+import type { LngLat } from "maplibre-gl";
 
 import { CENTER_POLAND } from "~/lib/constants";
 
 const colorMode = useColorMode();
-const style = computed(() => {
-  return colorMode.value === "dark" ? "/styles/dark.json" : "https://tiles.openfreemap.org/styles/liberty";
-});
-
 const mapStore = useMapStore();
 
-onMounted(() => {
-  mapStore.initMap();
-});
+const style = computed(() =>
+  colorMode.value === "dark"
+    ? "/styles/dark.json"
+    : "https://tiles.openfreemap.org/styles/liberty");
+const zoom = 3;
 
 function updateAddedPoint(location: LngLat) {
   if (mapStore.addedPoint) {
     mapStore.addedPoint.lat = location.lat;
     mapStore.addedPoint.lng = location.lng;
   }
-}
+};
 
-function onDoubleClick(event: MapMouseEvent) {
+function onDoubleClick(mglEvent: MglEvent<"dblclick">) {
   if (mapStore.addedPoint) {
-    event.preventDefault();
-    updateAddedPoint(event.lngLat);
+    mapStore.addedPoint.lat = mglEvent.event.lngLat.lat;
+    mapStore.addedPoint.lng = mglEvent.event.lngLat.lng;
   }
 }
 
-const center = CENTER_POLAND;
-const zoom = 4;
+onMounted(() => {
+  mapStore.initMap();
+});
 </script>
 
 <template>
   <MglMap
     :map-style="style"
-    :center="center"
+    :center="CENTER_POLAND"
     :zoom="zoom"
-    @map:dblclick="onDoubleClick($event.event)"
+    @map:dblclick="onDoubleClick"
   >
     <MglNavigationControl />
     <MglMarker
       v-if="mapStore.addedPoint"
+      draggable
+      class-name="z-50"
       :coordinates="{
         lng: mapStore.addedPoint.lng,
         lat: mapStore.addedPoint.lat,
       }"
-      draggable
-      class-name="z-50"
       @update:coordinates="updateAddedPoint"
     >
       <template #marker>
@@ -57,9 +57,8 @@ const zoom = 4;
         >
           <Icon
             name="tabler:map-pin-filled"
-            class="text-warning"
-
-            :size="30"
+            size="35"
+            class="text-primary dark:text-warning"
           />
         </div>
       </template>
@@ -67,20 +66,25 @@ const zoom = 4;
     <MglMarker
       v-for="point in mapStore.mapPoints"
       :key="point.id"
-      :coordinates="[point.lng, point.lat]"
+      :coordinates="{
+        lng: point.lng,
+        lat: point.lat,
+      }"
     >
       <template #marker>
         <div
           class="tooltip tooltip-top hover:cursor-pointer"
-          :class="{ ' tooltip-open': isPointSelected(point, mapStore.selectedPoint) }"
           :data-tip="point.name"
+          :class="{
+            'tooltip-open': isPointSelected(point, mapStore.selectedPoint),
+          }"
           @mouseenter="mapStore.selectedPoint = point"
           @mouseleave="mapStore.selectedPoint = null"
         >
           <Icon
             name="tabler:map-pin-filled"
+            size="30"
             :class="isPointSelected(point, mapStore.selectedPoint) ? 'text-accent' : 'text-secondary'"
-            :size="30"
           />
         </div>
       </template>
@@ -91,14 +95,14 @@ const zoom = 4;
         <p v-if="point.description">
           {{ point.description }}
         </p>
-        <div class="flex justify-end mt-2">
-          <nuxt-link
+        <div class="flex justify-end mt-4">
+          <NuxtLink
             v-if="point.to"
             :to="point.to"
             class="btn btn-sm btn-outline"
           >
             {{ point.toLabel }}
-          </nuxt-link>
+          </NuxtLink>
         </div>
       </MglPopup>
     </MglMarker>

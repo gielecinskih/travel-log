@@ -27,7 +27,7 @@ export const locationRelation = relations(location, ({ many }) => ({
   locationLogs: many(locationLog),
 }));
 
-export const insertLocationSchema = createInsertSchema(location, {
+export const InsertLocation = createInsertSchema(location, {
   name: field => field.min(1).max(100),
   description: field => field.max(1000),
   lat: field => field.min(-90).max(90),
@@ -40,7 +40,7 @@ export const insertLocationSchema = createInsertSchema(location, {
   updatedAt: true,
 });
 
-export type InsertLocationSchema = z.infer<typeof insertLocationSchema>;
+export type InsertLocation = z.infer<typeof InsertLocation>;
 
 export type SelectLocation = typeof location.$inferSelect;
 export type SelectLocationWithLogs = SelectLocation & {
