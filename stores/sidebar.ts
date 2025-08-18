@@ -4,7 +4,7 @@ import type { MapPoint } from "~/lib/types";
 
 export type SidebarItem = {
   id: string;
-  name: string;
+  label: string;
   icon: string;
   href?: string;
   to?: RouteLocationRaw;

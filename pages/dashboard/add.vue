@@ -1,106 +1,17 @@
-<script setup lang="ts">
-import type { FetchError } from "ofetch";
-
-import { toTypedSchema } from "@vee-validate/zod";
-
-import type { NominatimResult } from "~/lib/types";
-
-import { CENTER_POLAND } from "~/lib/constants";
-import { insertLocationSchema } from "~/lib/db/schema";
+<script lang="ts" setup>
+import type { InsertLocation } from "~/lib/db/schema";
 
 const { $csrfFetch } = useNuxtApp();
-const mapStore = useMapStore();
 
-const loading = ref(false);
-const submited = ref(false);
-
-const submitError = ref("");
-const { handleSubmit, errors, meta, setErrors, setFieldValue, controlledValues } = useForm({
-  initialValues: {
-    name: "",
-    description: "",
-    lat: CENTER_POLAND.lat,
-    lng: CENTER_POLAND.lng,
-  },
-  validationSchema: toTypedSchema(insertLocationSchema),
-});
-
-onMounted(() => {
-  mapStore.addedPoint = {
-    id: 1,
-    name: "",
-    description: "",
-    lat: CENTER_POLAND.lat,
-    lng: CENTER_POLAND.lng,
-  };
-});
-
-const onSubmit = handleSubmit(async (values) => {
-  if (loading.value)
-    return;
-
-  submitError.value = ""; // Reset error message before submission
-  try {
-    loading.value = true;
-    await $csrfFetch("/api/locations", {
-      method: "post",
-      body: values,
-    });
-
-    submited.value = true;
-    navigateTo("/dashboard");
-  }
-  catch (e) {
-    const error = e as FetchError;
-    if (error.data.data)
-      setErrors(error.data.data || {});
-    submitError.value = getFetchErrorMessage(error);
-  }
-  finally {
-    loading.value = false;
-  }
-});
-
-function searchResultSelected(result: NominatimResult) {
-  mapStore.addedPoint = {
-    id: 1,
-    name: "",
-    description: "",
-    lat: Number(result.lat),
-    lng: Number(result.lon),
-  };
-
-  setFieldValue("name", result.display_name);
+async function onSubmit(values: InsertLocation) {
+  await $csrfFetch("/api/locations", {
+    method: "post",
+    body: values,
+  });
 }
 
-effect(() => {
-  if (mapStore.addedPoint) {
-    setFieldValue("lat", mapStore.addedPoint.lat);
-    setFieldValue("lng", mapStore.addedPoint.lng);
-  }
-});
-
-const router = useRouter();
-
-onBeforeRouteLeave(() => {
-  if (meta.value.dirty && !submited.value) {
-    // eslint-disable-next-line no-alert
-    const confirm = window.confirm("You have unsaved changes. Are you sure you want to leave?");
-    if (!confirm) {
-      return false;
-    }
-  }
-  return true;
-});
-
-onUnmounted(() => {
-  mapStore.addedPoint = null;
-});
-
-function formatValue(value?: number) {
-  if (!value)
-    return 0;
-  return value.toFixed(5);
+function onSubmitComplete() {
+  navigateTo("/dashboard");
 }
 </script>
 
@@ -108,79 +19,17 @@ function formatValue(value?: number) {
   <div class="container max-w-md mx-auto p-4">
     <div class="my-4">
       <h1 class="text-lg">
-        Add location
+        Add Location
       </h1>
       <p class="text-sm">
         A location is a place you have traveled or will travel to. It can be a city, country, state or point of interest. You can add specific times you visited this location after adding it.
       </p>
     </div>
-    <div
-      v-if="submitError"
-      role="alert"
-      class="alert alert-error"
-    >
-      <span>{{ submitError }}</span>
-    </div>
-    <form class="flex flex-col gap-2" @submit.prevent="onSubmit">
-      <app-form-field
-        label="Name"
-        name="name"
-        type="text"
-        :disabled="loading"
-        :error="errors.name"
-      />
-      <app-form-field
-        label="Description"
-        name="description"
-        type="text"
-        as="textarea"
-        :disabled="loading"
-        :error="errors.description"
-      />
-      <p class="text-xs text-gray-400">
-        Current location: {{ formatValue(controlledValues.lat) }} {{ formatValue(controlledValues.lng) }}
-      </p>
-      <p>
-        To set the location:
-      </p>
-      <ul class="list-disc ml-4 text-sm">
-        <li>
-          Drag the marker <Icon
-            name="tabler:map-pin-filled"
-            class="text-warning"
-            size="14"
-          />
-        </li>
-        <li>Double click on the map</li>
-        <li>Search for location below</li>
-      </ul>
-
-      <div class="flex justify-end gap-2">
-        <button
-          type="button"
-          class="btn btn-outline"
-          :disabled="loading"
-          @click="router.back()"
-        >
-          <Icon name="tabler:arrow-left" size="24" />
-          Cancel
-        </button>
-        <button
-          type="submit"
-          class="btn btn-primary"
-          :disabled="loading"
-        >
-          Add
-          <span v-if="loading" class="loading loading-dots loading-sm" />
-          <Icon
-            v-else
-            name="tabler:circle-plus-filled"
-            size="24"
-          />
-        </button>
-      </div>
-    </form>
-    <div class="divider" />
-    <app-place-search @result-selected="searchResultSelected" />
+    <location-form
+      :on-submit
+      :on-submit-complete
+      submit-label="Add"
+      submit-icon="tabler:circle-plus-filled"
+    />
   </div>
 </template>
